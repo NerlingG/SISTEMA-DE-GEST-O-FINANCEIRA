@@ -42,8 +42,8 @@ O sistema permite o cadastro e controle de receitas e despesas de uma organizaç
 
 **1. Clone o repositório**
 ```bash
-git clone git@github.com:seu-usuario/sistema-gestao-financeira.git
-cd sistema-gestao-financeira
+git clone git@github.com:nerlingg/sistema-gest-o-financeira.git
+cd sistema-gest-o-financeira
 ```
 
 **2. Crie e ative o ambiente virtual**
@@ -70,7 +70,7 @@ DB_CONFIG = {
     "host":     "localhost",
     "port":     3306,
     "user":     "root",
-    "password": "",               # sua senha do MySQL
+    "password": "senha123",               
     "database": "gestao_financeira",
     "charset":  "utf8mb4",
 }
