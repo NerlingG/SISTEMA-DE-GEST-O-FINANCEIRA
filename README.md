@@ -1,4 +1,12 @@
-# Sistema de Gestão Financeira com K-Means
+## Estrutura do projeto
+
+```
+sistema-gestao-financeira/
+├── main.py          # FastAPI — rotas da API e serve o frontend
+├── models.py        # Queries MySQL (CRUD e relatório)
+├── database.py      # Conexão e inicialização do banco
+├── kmeans.py        # Algoritmo K-Means implementado do zero
+├── config.py     # Sistema de Gestão Financeira com K-Means
 
 Sistema web de gestão financeira empresarial com aplicação do algoritmo K-Means implementado do zero para segmentação e análise de dados financeiros.
 
@@ -92,18 +100,7 @@ python database.py
 ```bash
 uvicorn main:app --reload
 ```
-
-Acesse em: [http://localhost:8000](http://localhost:8000)
-
-## Estrutura do projeto
-
-```
-sistema-gestao-financeira/
-├── main.py          # FastAPI — rotas da API e serve o frontend
-├── models.py        # Queries MySQL (CRUD e relatório)
-├── database.py      # Conexão e inicialização do banco
-├── kmeans.py        # Algoritmo K-Means implementado do zero
-├── config.py        # Configurações do banco de dados
+   # Configurações do banco de dados
 ├── requirements.txt
 └── static/          # Frontend (servido pelo FastAPI)
     ├── api.js           # Comunicação com a API via fetch()
