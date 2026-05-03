@@ -1,6 +1,6 @@
 # Sistema de Gestão Financeira com K-Means
 
-Sistema web de gestão financeira empresarial com aplicação do algoritmo K-Means para segmentação e análise de dados financeiros.
+Sistema web de gestão financeira empresarial com aplicação do algoritmo K-Means implementado do zero para segmentação e análise de dados financeiros.
 
 Projeto Integrador III — Curso de Ciência da Computação  
 Universidade Regional Integrada do Alto Uruguai e das Missões — URI Erechim
@@ -9,26 +9,26 @@ Universidade Regional Integrada do Alto Uruguai e das Missões — URI Erechim
 
 ## Sobre o projeto
 
-O sistema permite o cadastro e controle de receitas e despesas de uma organização, aplicando o algoritmo de agrupamento K-Means para identificar padrões nos dados financeiros e auxiliar na tomada de decisões estratégicas.
+O sistema permite o cadastro e controle de receitas e despesas de uma organização, aplicando o algoritmo de agrupamento K-Means — desenvolvido manualmente, sem uso de bibliotecas de machine learning — para identificar padrões nos dados financeiros e auxiliar na tomada de decisões estratégicas.
 
 ## Funcionalidades
 
-- Autenticação de usuários (login e logout)
-- Cadastro, edição e exclusão de transações financeiras
-- Categorização de receitas e despesas
-- Aplicação do algoritmo K-Means para segmentação dos dados
-- Visualização dos clusters gerados com gráficos interativos (Plotly)
-- Dashboard com indicadores financeiros
+- Cadastro, edição e exclusão de transações financeiras (receitas e despesas)
+- Aplicação do algoritmo K-Means do zero para segmentação dos dados
+- Visualização dos clusters gerados com gráficos interativos (canvas puro)
+- Dashboard com indicadores financeiros do mês
 - Relatórios de evolução financeira por período
+- Método do Cotovelo para escolha do k ideal
+- API REST para comunicação entre frontend e backend
 
 ## Tecnologias utilizadas
 
 | Camada | Tecnologia |
 |---|---|
-| Backend | Python 3 + Django |
+| Backend | Python 3 + FastAPI |
 | Banco de dados | MySQL (XAMPP) |
-| Análise de dados | Pandas + Scikit-learn |
-| Visualização | Plotly |
+| Algoritmo K-Means | Python puro (sem bibliotecas de ML) |
+| Visualização | Canvas API (JavaScript puro) |
 | Frontend | HTML + CSS + JavaScript |
 | Controle de versão | Git + GitHub |
 
@@ -62,31 +62,35 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-**4. Configure as variáveis de ambiente**
+**4. Configure o banco de dados**
 
-Crie um arquivo `.env` na raiz do projeto com o seguinte conteúdo:
-```
-SECRET_KEY=sua-chave-secreta-aqui
-DEBUG=True
-DB_NAME=gestao_financeira
-DB_USER=root
-DB_PASSWORD=
-DB_HOST=localhost
-DB_PORT=3306
+Edite o arquivo `config.py` na raiz do projeto:
+```python
+DB_CONFIG = {
+    "host":     "localhost",
+    "port":     3306,
+    "user":     "root",
+    "password": "",               # sua senha do MySQL
+    "database": "gestao_financeira",
+    "charset":  "utf8mb4",
+}
 ```
 
 **5. Crie o banco de dados**
 
-Com o XAMPP iniciado, acesse o phpMyAdmin e crie um banco chamado `gestao_financeira`.
+Com o XAMPP iniciado, acesse o phpMyAdmin e crie um banco chamado `gestao_financeira`, ou execute:
+```sql
+CREATE DATABASE gestao_financeira CHARACTER SET utf8mb4;
+```
 
-**6. Execute as migrations**
+**6. Inicialize as tabelas**
 ```bash
-python manage.py migrate
+python database.py
 ```
 
 **7. Inicie o servidor**
 ```bash
-python manage.py runserver
+uvicorn main:app --reload
 ```
 
 Acesse em: [http://localhost:8000](http://localhost:8000)
@@ -95,17 +99,31 @@ Acesse em: [http://localhost:8000](http://localhost:8000)
 
 ```
 sistema-gestao-financeira/
-├── config/             # Configurações do Django
-├── core/               # Autenticação e dashboard
-├── transacoes/         # CRUD de receitas e despesas
-├── analise/            # Lógica do K-Means
-├── relatorios/         # Geração de gráficos com Plotly
-├── static/             # CSS e JavaScript
-├── templates/          # Templates HTML base
+├── main.py          # FastAPI — rotas da API e serve o frontend
+├── models.py        # Queries MySQL (CRUD e relatório)
+├── database.py      # Conexão e inicialização do banco
+├── kmeans.py        # Algoritmo K-Means implementado do zero
+├── config.py        # Configurações do banco de dados
 ├── requirements.txt
-├── manage.py
-└── .env                # Não versionado
+└── static/          # Frontend (servido pelo FastAPI)
+    ├── api.js           # Comunicação com a API via fetch()
+    ├── index.html       # Dashboard financeiro
+    ├── transacoes.html  # CRUD de receitas e despesas
+    ├── relatorio.html   # Relatório mensal com gráficos
+    └── clusters.html    # Análise K-Means com scatter e cotovelo
 ```
+
+## Rotas da API
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | /api/transacoes | Lista transações (filtros: mes, ano, tipo) |
+| POST | /api/transacoes | Cria uma transação |
+| PUT | /api/transacoes/{id} | Atualiza uma transação |
+| DELETE | /api/transacoes/{id} | Remove uma transação |
+| GET | /api/relatorio | Relatório mensal (params: mes, ano) |
+| GET | /api/anos | Anos com dados registrados |
+| GET | /api/clusters | Executa o K-Means (params: tipo, k) |
 
 ## Autores
 
