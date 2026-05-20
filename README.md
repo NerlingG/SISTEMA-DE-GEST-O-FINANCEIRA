@@ -1,12 +1,4 @@
-## Estrutura do projeto
-
-```
-sistema-gestao-financeira/
-├── main.py          # FastAPI — rotas da API e serve o frontend
-├── models.py        # Queries MySQL (CRUD e relatório)
-├── database.py      # Conexão e inicialização do banco
-├── kmeans.py        # Algoritmo K-Means implementado do zero
-├── config.py     # Sistema de Gestão Financeira com K-Means
+# Sistema de Gestão Financeira com K-Means
 
 Sistema web de gestão financeira empresarial com aplicação do algoritmo K-Means implementado do zero para segmentação e análise de dados financeiros.
 
@@ -23,7 +15,7 @@ O sistema permite o cadastro e controle de receitas e despesas de uma organizaç
 
 - Cadastro, edição e exclusão de transações financeiras (receitas e despesas)
 - Aplicação do algoritmo K-Means do zero para segmentação dos dados
-- Visualização dos clusters gerados com gráficos interativos (canvas puro)
+- Visualização dos clusters gerados com gráficos interativos (Canvas API)
 - Dashboard com indicadores financeiros do mês
 - Relatórios de evolução financeira por período
 - Método do Cotovelo para escolha do k ideal
@@ -50,8 +42,8 @@ O sistema permite o cadastro e controle de receitas e despesas de uma organizaç
 
 **1. Clone o repositório**
 ```bash
-git clone git@github.com:nerlingg/sistema-gest-o-financeira.git
-cd sistema-gest-o-financeira
+git clone https://github.com/seu-usuario/sistema-gestao-financeira.git
+cd sistema-gestao-financeira
 ```
 
 **2. Crie e ative o ambiente virtual**
@@ -70,23 +62,25 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-**4. Configure o banco de dados**
+**4. Configure as variáveis de ambiente**
 
-Edite o arquivo `config.py` na raiz do projeto:
-```python
-DB_CONFIG = {
-    "host":     "localhost",
-    "port":     3306,
-    "user":     "root",
-    "password": "senha123",               
-    "database": "gestao_financeira",
-    "charset":  "utf8mb4",
-}
+Copie o arquivo de exemplo e preencha com seus dados:
+```bash
+cp .env.example .env
+```
+
+Edite o `.env`:
+```
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=        # sua senha do MySQL (deixe vazio se não tiver)
+DB_NAME=gestao_financeira
 ```
 
 **5. Crie o banco de dados**
 
-Com o XAMPP iniciado, acesse o phpMyAdmin e crie um banco chamado `gestao_financeira`, ou execute:
+Com o XAMPP iniciado, acesse o phpMyAdmin e crie um banco chamado `gestao_financeira`, ou execute no terminal MySQL:
 ```sql
 CREATE DATABASE gestao_financeira CHARACTER SET utf8mb4;
 ```
@@ -100,8 +94,23 @@ python database.py
 ```bash
 uvicorn main:app --reload
 ```
-   # Configurações do banco de dados
-├── requirements.txt
+
+Acesse em: [http://localhost:8000](http://localhost:8000)
+
+> A documentação automática da API fica em: [http://localhost:8000/docs](http://localhost:8000/docs)
+
+## Estrutura do projeto
+
+```
+sistema-gestao-financeira/
+├── main.py          # FastAPI — rotas da API e serve o frontend
+├── models.py        # Queries MySQL (CRUD e relatório)
+├── database.py      # Conexão e inicialização do banco
+├── kmeans.py        # Algoritmo K-Means implementado do zero
+├── config.py        # Lê as variáveis do arquivo .env
+├── requirements.txt # Dependências Python
+├── .env.example     # Modelo de configuração (copie para .env)
+├── .gitignore       # Arquivos ignorados pelo Git
 └── static/          # Frontend (servido pelo FastAPI)
     ├── api.js           # Comunicação com a API via fetch()
     ├── index.html       # Dashboard financeiro
