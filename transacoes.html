@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Transações — Gestor Financeiro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #181c27;
+      --surface2: #1e2333;
+      --border: #2a3045;
+      --accent: #4ade80;
+      --accent2: #f87171;
+      --accent3: #60a5fa;
+      --text: #e8eaf0;
+      --muted: #7a8299;
+      --radius: 12px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      min-height: 100vh;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 220px;
+      min-height: 100vh;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 28px 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 10;
+    }
+
+    .sidebar-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.3rem;
+      color: var(--accent);
+      padding: 0 24px 28px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-logo span {
+      color: var(--muted);
+      font-size: .75rem;
+      display: block;
+      font-family: 'DM Sans', sans-serif;
+      margin-top: 2px;
+    }
+
+    .nav {
+      padding: 20px 0;
+      flex: 1;
+    }
+
+    .nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 24px;
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: .9rem;
+      border-left: 3px solid transparent;
+      transition: all .15s;
+    }
+
+    .nav a:hover,
+    .nav a.active {
+      color: var(--text);
+      background: var(--surface2);
+      border-left-color: var(--accent);
+    }
+
+    .nav a .icon {
+      font-size: 1.1rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .main {
+      margin-left: 220px;
+      flex: 1;
+      padding: 36px 40px;
+      max-width: calc(100vw - 220px);
+    }
+
+    .page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .page-header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      font-weight: 400;
+      letter-spacing: -.5px;
+    }
+
+    select,
+    input {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .875rem;
+      outline: none;
+      transition: border-color .15s;
+    }
+
+    select:focus,
+    input:focus {
+      border-color: var(--accent3);
+    }
+
+    select option {
+      background: var(--surface2);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .875rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      transition: all .15s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0a1a0f;
+    }
+
+    .btn-primary:hover {
+      background: #22c55e;
+    }
+
+    .btn-danger {
+      background: var(--accent2);
+      color: #1a0a0a;
+    }
+
+    .btn-danger:hover {
+      background: #ef4444;
+    }
+
+    .btn-ghost {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: .8rem;
+    }
+
+    .filters {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .fg {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .fg label {
+      font-size: .72rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 10px 16px;
+      font-size: .72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background .1s;
+    }
+
+    tbody tr:hover {
+      background: var(--surface2);
+    }
+
+    tbody td {
+      padding: 13px 16px;
+      font-size: .9rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+
+    .badge-ganho {
+      background: rgba(74, 222, 128, .15);
+      color: var(--accent);
+    }
+
+    .badge-gasto {
+      background: rgba(248, 113, 113, .15);
+      color: var(--accent2);
+    }
+
+    .tx-count {
+      font-size: .8rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .tx-count strong {
+      color: var(--text);
+    }
+
+    .empty-box {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+
+    .empty-box .icon {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .flash {
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: .9rem;
+      margin-bottom: 16px;
+    }
+
+    .flash.success {
+      background: rgba(74, 222, 128, .12);
+      border: 1px solid rgba(74, 222, 128, .3);
+      color: var(--accent);
+    }
+
+    .flash.error {
+      background: rgba(248, 113, 113, .12);
+      border: 1px solid rgba(248, 113, 113, .3);
+      color: var(--accent2);
+    }
+
+    .erro-servidor {
+      background: rgba(248, 113, 113, .08);
+      border: 1px solid rgba(248, 113, 113, .25);
+      border-radius: var(--radius);
+      padding: 32px;
+      text-align: center;
+      color: var(--accent2);
+    }
+
+    .erro-servidor .icon {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .erro-servidor p {
+      color: var(--muted);
+      font-size: .9rem;
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+
+    .erro-servidor code {
+      background: var(--surface2);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: .85rem;
+      color: var(--accent3);
+    }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .65);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 32px;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, .5);
+      animation: slideUp .2s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(16px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .modal-header h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.35rem;
+      font-weight: 400;
+    }
+
+    .modal-close {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      color: var(--text);
+    }
+
+    .mg {
+      margin-bottom: 18px;
+    }
+
+    .mg label {
+      display: block;
+      font-size: .75rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .mg input,
+    .mg select,
+    .mg textarea {
+      width: 100%;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .valor-wrap {
+      position: relative;
+    }
+
+    .valor-prefix {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-weight: 600;
+      font-size: .9rem;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .valor-wrap input {
+      padding-left: 36px !important;
+      width: 100%;
+    }
+
+    .tipo-toggle {
+      display: flex;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .tipo-toggle button {
+      flex: 1;
+      padding: 8px 18px;
+      border: none;
+      border-radius: 6px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .875rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      color: var(--muted);
+      transition: all .15s;
+    }
+
+    .tipo-toggle button.active-ganho {
+      background: rgba(74, 222, 128, .18);
+      color: var(--accent);
+    }
+
+    .tipo-toggle button.active-gasto {
+      background: rgba(248, 113, 113, .18);
+      color: var(--accent2);
+    }
+
+    /* ── Confirm ── */
+    .confirm-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .65);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .confirm-overlay.open {
+      display: flex;
+    }
+
+    .confirm-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      max-width: 360px;
+      text-align: center;
+    }
+
+    .confirm-box h3 {
+      font-size: 1.05rem;
+    }
+
+    .confirm-box p {
+      color: var(--muted);
+      font-size: .9rem;
+      margin: 10px 0 20px;
+    }
+
+    .confirm-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+  </style>
+</head>
+
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-logo">Gestor Financeiro<span>Gestão Inteligente</span></div>
+    <nav class="nav">
+        <a href="/"><span class="icon">📊</span>Dashboard</a>
+        <a href="/transacoes" class="active"> <span class="icon">💳</span>Transações</a>
+        <a href="/relatorio"> <span class="icon">📄</span>Relatório</a>
+        <a href="/clusters"> <span class="icon">🔬</span>Clusters</a>
+      </nav>
+  </aside>
+
+  <main class="main">
+    <div class="page-header">
+      <h1>Transações</h1>
+      <button class="btn btn-primary" onclick="abrirModal()">＋ Nova transação</button>
+    </div>
+
+    <div id="flashArea"></div>
+
+    <div class="filters">
+      <div class="fg"><label>Mês</label>
+        <select id="filtMes">
+          <option value="">Todos</option>
+        </select>
+      </div>
+      <div class="fg"><label>Ano</label>
+        <select id="filtAno">
+          <option value="">Todos</option>
+        </select>
+      </div>
+      <div class="fg"><label>Tipo</label>
+        <select id="filtTipo">
+          <option value="">Todos</option>
+          <option value="ganho">Ganho</option>
+          <option value="gasto">Gasto</option>
+        </select>
+      </div>
+      <button class="btn btn-ghost" style="align-self:flex-end" onclick="render()">Filtrar</button>
+      <button class="btn btn-ghost" style="align-self:flex-end" onclick="limpar()">Limpar</button>
+    </div>
+
+    <div class="tx-count" id="txCount"></div>
+    <div id="tabelaWrap"></div>
+  </main>
+
+  <!-- ══ MODAL NOVA / EDITAR ══ -->
+  <div class="modal-overlay" id="txModal" onclick="fecharSeOverlay(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">Nova Transação</h2>
+        <button class="modal-close" onclick="fecharModal()">✕</button>
+      </div>
+
+      <!-- Tipo -->
+      <div class="mg">
+        <label>Tipo</label>
+        <div class="tipo-toggle">
+          <button type="button" id="btnGanho" onclick="setTipo('ganho')">💰 Ganho</button>
+          <button type="button" id="btnGasto" onclick="setTipo('gasto')">💸 Gasto</button>
+        </div>
+      </div>
+
+      <!-- Descrição -->
+      <div class="mg">
+        <label>Descrição *</label>
+        <input type="text" id="fDesc" placeholder="Ex.: Salário março" autocomplete="off">
+      </div>
+
+      <!-- Valor -->
+      <div class="mg">
+        <label>Valor (R$) *</label>
+        <div class="valor-wrap">
+          <span class="valor-prefix">R$</span>
+          <input type="number" id="fValor" step="0.01" min="0.01" placeholder="0,00">
+        </div>
+      </div>
+
+      <!-- Mês e Ano -->
+      <div class="form-row">
+        <div class="mg" style="margin-bottom:0">
+          <label>Mês *</label>
+          <select id="fMes"></select>
+        </div>
+        <div class="mg" style="margin-bottom:0">
+          <label>Ano *</label>
+          <input type="number" id="fAno" min="2000" max="2099">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:26px;">
+        <button class="btn btn-primary" style="flex:1" onclick="salvar()">Salvar</button>
+        <button class="btn btn-ghost" onclick="fecharModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CONFIRM DELETE ══ -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-box">
+      <h3>Remover transação?</h3>
+      <p id="confirmDesc"></p>
+      <div class="confirm-actions">
+        <button class="btn btn-danger" onclick="confirmarDelete()">Sim, remover</button>
+        <button class="btn btn-ghost" onclick="fecharConfirm()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/api.js"></script>
+  <script>
+    let editId = null;
+    let deleteId = null;
+    let tipoAtual = 'gasto';
+
+    // ── Init ─────────────────────────────────────────────────
+    async function init() {
+      // Preenche filtros
+      mesOptions(document.getElementById('filtMes'), null);
+      await anoOptions(document.getElementById('filtAno'), null, true);
+
+      // Preenche selects do modal — síncrono, independente da API
+      mesOptions(document.getElementById('fMes'), new Date().getMonth() + 1);
+      document.getElementById('fAno').value = new Date().getFullYear();
+
+      setTipo('gasto');
+      await render();
+    }
+
+    // ── Render tabela ─────────────────────────────────────────
+    async function render() {
+      const params = {};
+      const mes = document.getElementById('filtMes').value;
+      const ano = document.getElementById('filtAno').value;
+      const tipo = document.getElementById('filtTipo').value;
+      if (mes) params.mes = mes;
+      if (ano) params.ano = ano;
+      if (tipo) params.tipo = tipo;
+
+      try {
+        const lista = await API.listar(params);
+        document.getElementById('txCount').innerHTML =
+          `<strong>${lista.length}</strong> transação(ões) encontrada(s)`;
+
+        if (!lista.length) {
+          document.getElementById('tabelaWrap').innerHTML = `
+        <div class="card empty-box">
+          <span class="icon">💳</span>Nenhuma transação encontrada.
+          <div style="margin-top:20px">
+            <button class="btn btn-primary" onclick="abrirModal()">＋ Cadastrar primeira transação</button>
+          </div>
+        </div>`;
+          return;
+        }
+
+        document.getElementById('tabelaWrap').innerHTML = `
+      <div class="card" style="padding:0">
+        <div class="table-wrap"><table>
+          <thead>
+            <tr>
+              <th>#</th><th>Descrição</th><th>Tipo</th>
+              <th>Mês/Ano</th><th>Valor</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${lista.map(t => `
+              <tr>
+                <td style="color:var(--muted);font-size:.8rem">${t.id}</td>
+                <td style="font-weight:500">${t.descricao}</td>
+                <td><span class="badge badge-${t.tipo}">${t.tipo}</span></td>
+                <td style="color:var(--muted)">${String(t.mes).padStart(2, '0')}/${t.ano}</td>
+                <td style="font-family:'DM Serif Display',serif;font-size:1rem;
+                    color:${t.tipo === 'ganho' ? 'var(--accent)' : 'var(--accent2)'}">
+                  ${t.tipo === 'ganho' ? '+' : '-'}${fmtBRL(t.valor)}
+                </td>
+                <td>
+                  <div style="display:flex;gap:6px">
+                    <button class="btn btn-ghost btn-sm"
+                      onclick='abrirEdicao(${JSON.stringify(t)})'>✏️</button>
+                    <button class="btn btn-ghost btn-sm"
+                      onclick="pedirDelete(${t.id},'${t.descricao.replace(/'/g, "\\'")}')">🗑️</button>
+                  </div>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table></div>
+      </div>`;
+
+      } catch (e) {
+        document.getElementById('tabelaWrap').innerHTML = `
+      <div class="erro-servidor">
+        <span class="icon">⚠️</span>
+        <strong>Servidor não encontrado.</strong>
+        <p>Verifique se o XAMPP está rodando com MySQL ativo,<br>
+        depois execute no terminal:<br>
+        <code>uvicorn main:app --reload</code></p>
+      </div>`;
+      }
+    }
+
+    function limpar() {
+      document.getElementById('filtMes').value = '';
+      document.getElementById('filtAno').value = '';
+      document.getElementById('filtTipo').value = '';
+      render();
+    }
+
+    // ── Modal ─────────────────────────────────────────────────
+    function setTipo(t) {
+      tipoAtual = t;
+      document.getElementById('btnGanho').className = t === 'ganho' ? 'active-ganho' : '';
+      document.getElementById('btnGasto').className = t === 'gasto' ? 'active-gasto' : '';
+    }
+
+    function abrirModal() {
+      editId = null;
+      document.getElementById('modalTitle').textContent = 'Nova Transação';
+      document.getElementById('fDesc').value = '';
+      document.getElementById('fValor').value = '';
+      mesOptions(document.getElementById('fMes'), new Date().getMonth() + 1);
+      document.getElementById('fAno').value = new Date().getFullYear();
+      setTipo('gasto');
+      document.getElementById('txModal').classList.add('open');
+      // Foca o campo descrição automaticamente
+      setTimeout(() => document.getElementById('fDesc').focus(), 100);
+    }
+
+    function abrirEdicao(t) {
+      editId = t.id;
+      document.getElementById('modalTitle').textContent = 'Editar Transação';
+      document.getElementById('fDesc').value = t.descricao;
+      document.getElementById('fValor').value = t.valor;
+      mesOptions(document.getElementById('fMes'), t.mes);
+      document.getElementById('fAno').value = t.ano;
+      setTipo(t.tipo);
+      document.getElementById('txModal').classList.add('open');
+    }
+
+    function fecharModal() { document.getElementById('txModal').classList.remove('open'); }
+    function fecharSeOverlay(e) { if (e.target.id === 'txModal') fecharModal(); }
+
+    // Fecha com ESC
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { fecharModal(); fecharConfirm(); }
+    });
+
+    async function salvar() {
+      const descricao = document.getElementById('fDesc').value.trim();
+      const valorStr = document.getElementById('fValor').value.replace(',', '.');
+      const valor = parseFloat(valorStr);
+      const mes = parseInt(document.getElementById('fMes').value);
+      const ano = parseInt(document.getElementById('fAno').value);
+
+      // Validações
+      if (!descricao) { flash('Descrição é obrigatória.', 'error'); return; }
+      if (!valorStr) { flash('Informe o valor.', 'error'); return; }
+      if (isNaN(valor) || valor <= 0) { flash('Valor deve ser um número positivo.', 'error'); return; }
+      if (!mes || mes < 1 || mes > 12) { flash('Selecione um mês válido.', 'error'); return; }
+      if (!ano || ano < 2000) { flash('Informe um ano válido.', 'error'); return; }
+
+      const body = { tipo: tipoAtual, descricao, valor, mes, ano };
+
+      try {
+        if (editId) {
+          await API.atualizar(editId, body);
+          flash('Transação atualizada!', 'success');
+        } else {
+          await API.criar(body);
+          flash('Transação cadastrada com sucesso!', 'success');
+        }
+        fecharModal();
+        await anoOptions(document.getElementById('filtAno'), null, true); // atualiza anos
+        await render();
+      } catch (e) {
+        flash(e.message, 'error');
+      }
+    }
+
+    // ── Delete ────────────────────────────────────────────────
+    function pedirDelete(id, desc) {
+      deleteId = id;
+      document.getElementById('confirmDesc').textContent =
+        `"${desc}" será removida permanentemente.`;
+      document.getElementById('confirmOverlay').classList.add('open');
+    }
+    function fecharConfirm() {
+      document.getElementById('confirmOverlay').classList.remove('open');
+      deleteId = null;
+    }
+    async function confirmarDelete() {
+      if (!deleteId) return;
+      try {
+        await API.deletar(deleteId);
+        flash('Transação removida.', 'success');
+        fecharConfirm();
+        await render();
+      } catch (e) {
+        flash(e.message, 'error');
+      }
+    }
+
+    // ── Start ─────────────────────────────────────────────────
+    init();
+  </script>
+</body>
+
+</html>
